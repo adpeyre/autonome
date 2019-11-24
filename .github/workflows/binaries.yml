@@ -1,0 +1,36 @@
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  deploy:
+    name: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Branch name
+        id: branch_name
+        run: |
+          echo ::set-output name=SOURCE_NAME::${GITHUB_REF#refs/*/}
+          echo ::set-output name=SOURCE_BRANCH::${GITHUB_REF#refs/heads/}
+          echo ::set-output name=SOURCE_TAG::${GITHUB_REF#refs/tags/}
+      - uses: actions/checkout@v1
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+      - run: npm install
+      - name: Building packages
+        run: ./script/pkg-build.sh $SOURCE_BRANCH
+        env:
+          SOURCE_BRANCH: ${{ steps.branch_name.outputs.SOURCE_TAG }}
+      - name: FTP-Deploy-Action
+        uses: SamKirkland/FTP-Deploy-Action@2.0.0
+        env:
+          FTP_SERVER: ftp1.yulpa.io
+          FTP_USERNAME: github-autonome@projet.peyre.fr
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          LOCAL_DIR: ./bin
+          ARGS:
+
+

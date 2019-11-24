@@ -1,0 +1,66 @@
+{
+  "name": "@adpeyre/autonome",
+  "version": "0.9.0",
+  "description": "Autonome is an app for keeping an eye on a place.",
+  "author": "Adrien Peyre",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adpeyre/autonome.git"
+  },
+  "homepage": "https://github.com/adpeyre/autonome/blob/master/README.md",
+  "bugs": {
+    "url": "https://github.com/adpeyre/autonome/issues"
+  },
+  "main": "build/app.js",
+  "bin": {
+    "autonome": "build/app.js"
+  },
+  "scripts": {
+    "build": "webpack",
+    "watch": "webpack --watch",
+    "prettier": "prettier --write 'src/**/*.{js,ts}'",
+    "lint": "eslint 'src/**/*.{js,ts}'",
+    "lint-fix": "eslint 'src/**/*.{js,ts}' --fix",
+    "bin": "./script/pkg-build.sh"
+  },
+  "dependencies": {
+    "@types/ftp": "^0.3.30",
+    "@types/shelljs": "^0.8.6",
+    "axios": "^0.18.1",
+    "child_process": "^1.0.2",
+    "eventbusjs": "^0.2.0",
+    "fs": "0.0.1-security",
+    "ftp": "^0.3.10",
+    "js-logger": "^1.6.0",
+    "mkdirp": "^0.5.1",
+    "node-webcam": "^0.5.0",
+    "shelljs": "^0.8.3"
+  },
+  "devDependencies": {
+    "@symfony/webpack-encore": "^0.28.2",
+    "@types/node": "^10.17.5",
+    "@typescript-eslint/eslint-plugin": "^2.8.0",
+    "@typescript-eslint/parser": "^2.8.0",
+    "eslint": "^6.7.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-config-prettier": "^6.7.0",
+    "eslint-import-resolver-typescript": "^1.1.1",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-prettier": "^3.1.1",
+    "pkg": "^4.4.0",
+    "prettier": "1.19.1",
+    "ts-loader": "^6.2.1",
+    "typescript": "^3.7.2",
+    "webpack": "^4.41.2",
+    "webpack-node-externals": "^1.7.2"
+  },
+  "directories": {
+    "example": "example"
+  },
+  "keywords": [
+    "autonome",
+    "watching",
+    "raspberry"
+  ],
+  "license": "ISC"
+}

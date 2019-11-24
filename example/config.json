@@ -1,0 +1,52 @@
+{
+  "directory": "/tmp/autonome",
+  "MOD_SHUTDOWN": {
+    "timeout": 120
+  },
+  "MOD_UPLOAD": {
+    "ftp": {
+      "host": "ftp.server.net",
+      "user": "myUser",
+      "password": "myPassword"
+    },
+    "localDir": "/tmp/autonome",
+    "remoteDir": "./uploads"
+  },
+  "MOD_TEMPERATURE": {
+    "sensors": [{
+      "type": "1_WIRE",
+      "id": "28-000005d36c35",
+      "name": "sensor_1"
+    }]
+  },
+  "MOD_NOTIFY": {
+    "axios": {
+      "method": "post",
+      "url": "http://autonome.site.net/update.php"
+    }
+  },
+  "MOD_SNAPSHOT": {
+    "cams": [
+      {
+        "filename": "cam0",
+        "fswebcam": {
+          "quality": 95,
+          "width": 3264,
+          "height": 2448,
+          "delay": 3,
+          "device": "/dev/cam1",
+          "verbose": true,
+          "skip": 15
+        }
+      }
+    ]
+  },
+  "MOD_INTERNET": {
+    "ipTest": "8.8.8.8",
+    "mobile": {
+      "wvdial": "example/wvdial.conf",
+      "interface": "/dev/ttyUSB0",
+      "pin": "0444"
+    }
+  }
+}

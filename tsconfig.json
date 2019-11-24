@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "noImplicitAny": true,
+        "target": "es2019",
+        "module": "commonjs",
+        "outDir": "./build",
+        "allowJs": false
+    },
+    "exclude" : [
+        "./build",
+        "./node_modules"
+    ]
+}
