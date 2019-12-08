@@ -1,17 +1,30 @@
-import { AbstractMod, ConfigInterface } from './AbstractMod';
+import { plainToClass } from 'class-transformer';
+import AbstractMod from '../AbstractMod';
+import Config from './Config';
 
 const shell = require('shelljs');
 
-export class ModInternet extends AbstractMod {
-  protected config?: ModInternetConfig;
+export default class ModInternet extends AbstractMod {
+  protected config?: Config;
 
-  public constructor(config?: ModInternetConfig) {
-    super('MOD_INTERNET');
-    this.config = config;
-    this.init();
+  protected load(): void {
+    this.name = 'MOD_INTERNET';
+    this.config = plainToClass(Config, this.app.getConfigSection(this.name));
   }
 
   protected exec(): void {
+    if (!this.config.mobile) {
+      ModInternet.testConnection(this.config.ipTest, true)
+        .then(() => {
+          this.endOk('Connected');
+        })
+        .catch(() => {
+          this.endErr('No connection');
+        });
+
+      return;
+    }
+
     ModInternet.testConnection(this.config.ipTest, true).catch((): void => {
       shell.exec(`find /dev -name ${this.config.mobile.interface}`, { silent: true }, (code: number): void => {
         if (code === 0) {
@@ -26,7 +39,7 @@ export class ModInternet extends AbstractMod {
     });
 
     ModInternet.testConnection(this.config.ipTest).then((): void => {
-      this.endOk();
+      this.endOk('Connection established');
     });
   }
 
@@ -63,33 +76,7 @@ export class ModInternet extends AbstractMod {
     });
   }
 
-  protected configChecker(): boolean {
-    if (!this.config.ipTest) {
-      return false;
-    }
-
-    if ('mobile' in this.config) {
-      if (!('wvdial' in this.config.mobile) || !('interface' in this.config.mobile) || !('pin' in this.config.mobile)) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
   protected dependencyChecker(): boolean {
     return shell.which('ping') && (!('mobile' in this.config) || shell.which('wvdial'));
   }
-}
-
-export interface ModInternetConfig extends ConfigInterface {
-  ipTest: string;
-
-  mobile?: MobileType;
-}
-
-interface MobileType {
-  wvdial: string;
-  interface: string;
-  pin: string;
 }

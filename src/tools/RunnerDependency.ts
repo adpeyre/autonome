@@ -1,4 +1,4 @@
-import { AbstractMod } from '../mods/AbstractMod';
+import AbstractMod from '../mods/AbstractMod';
 
 export default class RunnerDependency {
   public static readonly FAILURE = 'FAILURE';

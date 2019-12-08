@@ -1,33 +1,27 @@
+import { validateSync } from 'class-validator';
 import App from '../App';
+import ModConfigInterface from './ModConfigInterface';
 
 const EventBus = require('eventbusjs');
 
-export abstract class AbstractMod {
-  public static app: App;
+export default abstract class AbstractMod {
+  protected app: App;
 
   protected running: Promise<boolean>;
 
-  protected abstract config?: ConfigInterface;
+  protected abstract config?: ModConfigInterface;
 
   protected name: string;
 
-  protected constructor(name: string) {
-    this.name = name;
+  public constructor(app: App) {
+    this.app = app;
+    this.load();
+    this.init();
   }
 
+  protected abstract load(): void;
+
   protected init(): void {
-    if (!this.config) {
-      return;
-    }
-
-    if (!this.configChecker()) {
-      throw new Error(`Incorrect config for module ${this.getName()}`);
-    }
-
-    if (!this.dependencyChecker()) {
-      throw new Error(`Missing external dependency for module ${this.getName()}`);
-    }
-
     this.running = new Promise((resolve): void => {
       EventBus.addEventListener(
         `MOD_FINISHED_${this.name}`,
@@ -39,11 +33,24 @@ export abstract class AbstractMod {
         this,
       );
     });
+
+    if (!this.config) {
+      return;
+    }
+
+    const validationErrors = validateSync(this.config, { skipMissingProperties: false });
+    if (validationErrors.length > 0) {
+      this.endThrow(Object.values(validationErrors).join());
+    }
+
+    if (!this.dependencyChecker()) {
+      throw new Error(`Missing external dependency for module ${this.getName()}`);
+    }
   }
 
   public start(): void {
     if (!this.config) {
-      this.endOk();
+      this.skip();
       return;
     }
 
@@ -54,7 +61,7 @@ export abstract class AbstractMod {
   public stop(): void {}
 
   public skip(): void {
-    this.endOk('Skipping');
+    this.endOk('Skipped');
   }
 
   public endOk(msg?: string): void {
@@ -65,6 +72,10 @@ export abstract class AbstractMod {
     EventBus.dispatch(`MOD_FINISHED_${this.name}`, this, false, msg);
   }
 
+  public endThrow(msg: string): void {
+    throw new Error(`${this.name}: \n ${msg}`);
+  }
+
   public end(): Promise<boolean> {
     return this.running;
   }
@@ -73,25 +84,19 @@ export abstract class AbstractMod {
 
   public log(log: string): void {
     if (this) {
-      AbstractMod.app.logger.info(`[${this.name}]: ${log}`);
+      this.app.logger.info(`[${this.name}]: ${log}`);
     }
   }
 
   public addDataToSend(key: string, value: string): void {
-    AbstractMod.app.addDataToSend(key, value);
+    this.app.addDataToSend(key, value);
   }
 
   public getName(): string {
     return this.name;
   }
 
-  protected configChecker(): boolean {
-    return true;
-  }
-
   protected dependencyChecker(): boolean {
     return true;
   }
 }
-
-export interface ConfigInterface {}

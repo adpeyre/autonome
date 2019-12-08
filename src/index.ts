@@ -1,14 +1,9 @@
+import 'reflect-metadata';
 import App from './App';
-import { AbstractMod } from './mods/AbstractMod';
+import AbstractMod from './mods/AbstractMod';
 
-import { ModInfo, ModInfoConfig } from './mods/Info';
-import { ModShutdown, ModShutdownConfig } from './mods/Shutdown';
-import { ModSnapshot, ModSnapshotConfig } from './mods/Snapshot';
-import { ModUpload, ModUploadConfig } from './mods/Upload';
-import { ModNotify, ModNotifyConfig } from './mods/Notify';
-import { ModInternet, ModInternetConfig } from './mods/Internet';
-import { ModTemperature, ModTemperatureConfig } from './mods/Temperature';
 import RunnerDependency from './tools/RunnerDependency';
+import ModsLoader from './tools/ModsLoader';
 
 const mkdirp = require('mkdirp');
 
@@ -19,43 +14,37 @@ process.on('unhandledRejection', (e: Error): void => {
   app.halt();
 });
 
-app
-  .loadConfig(process.argv.length >= 3 ? process.argv[2] : null)
-  .catch((e: string): void => {
-    throw new Error(e);
-  })
-  .then((): void => {
-    AbstractMod.app = app;
-
-    mkdirp(app.getConfig('directory'), (err: string): void => {
-      if (err) {
-        throw new Error(`Impossible to create base directory: ${err}`);
-      }
-    });
-
-    const modInfo = new ModInfo(app.getConfig('MOD_INFO') as ModInfoConfig);
-    const modShutdown = new ModShutdown(app.getConfig('MOD_SHUTDOWN') as ModShutdownConfig);
-    const modSnapshot = new ModSnapshot(app.getConfig('MOD_SNAPSHOT') as ModSnapshotConfig);
-    const modUpload = new ModUpload(app.getConfig('MOD_UPLOAD') as ModUploadConfig);
-    const modNotify = new ModNotify(app.getConfig('MOD_NOTIFY') as ModNotifyConfig);
-    const modInternet = new ModInternet(app.getConfig('MOD_INTERNET') as ModInternetConfig);
-    const modTemperature = new ModTemperature(app.getConfig('MOD_TEMPERATURE') as ModTemperatureConfig);
-
-    app.launchMod(modInfo);
-    app.launchMod(modShutdown);
-    app.launchMod(modInternet);
-    app.launchMod(modSnapshot);
-    app.launchMod(modTemperature);
-    app.launchMod(modUpload, [
-      new RunnerDependency(modTemperature),
-      new RunnerDependency(modInternet, RunnerDependency.FAILURE),
-      new RunnerDependency(modSnapshot),
-    ]);
-    app.launchMod(modNotify, [new RunnerDependency(modUpload), new RunnerDependency(modInternet, RunnerDependency.FAILURE)]);
-
-    app.allModsAreFinished().then((): void => {
-      app.getAllMods().forEach((mod: AbstractMod): void => mod.stop());
-      app.logger.info('All process finished');
-      app.halt();
-    });
+app.loadConfig(process.argv.length >= 3 ? process.argv[2] : null).then((): void => {
+  mkdirp(app.getAppConfig().directory, (err: string): void => {
+    if (err) {
+      throw new Error(`Impossible to create base directory: ${err}`);
+    }
   });
+
+  const importedMods = ModsLoader.import(require.context('./mods/', true, /\/Mod\.ts$/));
+  const mods: { [key: string]: AbstractMod } = {};
+  for (const [name, ImportedMod] of Object.entries(importedMods)) {
+    mods[name] = new ImportedMod(app);
+  }
+
+  app.launchMod(mods.MOD_INFO);
+  app.launchMod(mods.MOD_TEMPERATURE);
+  app.launchMod(mods.MOD_NOTIFY, [
+    new RunnerDependency(mods.MOD_UPLOAD),
+    new RunnerDependency(mods.MOD_INTERNET, RunnerDependency.FAILURE),
+  ]);
+  app.launchMod(mods.MOD_SNAPSHOT);
+  app.launchMod(mods.MOD_SHUTDOWN);
+  app.launchMod(mods.MOD_INTERNET);
+  app.launchMod(mods.MOD_UPLOAD, [
+    new RunnerDependency(mods.MOD_TEMPERATURE),
+    new RunnerDependency(mods.MOD_INTERNET, RunnerDependency.FAILURE),
+    new RunnerDependency(mods.MOD_SNAPSHOT),
+  ]);
+
+  app.allModsAreFinished().then((): void => {
+    app.getAllMods().forEach((mod: AbstractMod): void => mod.stop());
+    app.logger.info('All process finished');
+    app.halt();
+  });
+});
