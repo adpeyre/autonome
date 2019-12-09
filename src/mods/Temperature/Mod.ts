@@ -1,24 +1,26 @@
-import { AbstractMod, ConfigInterface } from './AbstractMod';
+import { plainToClass } from 'class-transformer';
+import AbstractMod from '../AbstractMod';
+import Config from './Config';
+import SensorConfig from './SensorConfig';
 
 import shell = require('shelljs');
 
-export class ModTemperature extends AbstractMod {
+export default class ModTemperature extends AbstractMod {
   public static readonly BASE_PATH_1WIRE = '/sys/bus/w1/devices';
 
   public static readonly TYPE_1_WIRE = '1_WIRE';
 
-  protected config?: ModTemperatureConfig;
+  protected config?: Config;
 
-  public constructor(config?: ModTemperatureConfig) {
-    super('MOD_TEMPERATURE');
-    this.config = config;
-    this.init();
+  protected load(): void {
+    this.name = 'MOD_TEMPERATURE';
+    this.config = plainToClass(Config, this.app.getConfigSection(this.name));
   }
 
   protected exec(): void {
     const hasError = false;
 
-    this.config.sensors.forEach((sensor: SensorType): void => {
+    this.config.sensors.forEach((sensor: SensorConfig): void => {
       let value: string = null;
       if (sensor.type === ModTemperature.TYPE_1_WIRE) {
         value = this.oneWire(sensor.id);
@@ -43,28 +45,4 @@ export class ModTemperature extends AbstractMod {
 
     return null;
   }
-
-  protected configChecker(): boolean {
-    if (!this.config.sensors || !Array.isArray(this.config.sensors)) {
-      return false;
-    }
-
-    for (const sensor of this.config.sensors) {
-      if (!sensor.type || !sensor.name || !sensor.id) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-}
-
-export interface ModTemperatureConfig extends ConfigInterface {
-  sensors: SensorType[];
-}
-
-interface SensorType {
-  type: string;
-  id: string;
-  name: string;
 }

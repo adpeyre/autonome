@@ -1,5 +1,7 @@
 {
-  "directory": "/tmp/autonome",
+  "APP": {
+    "directory": "/tmp/autonome"
+  },
   "MOD_SHUTDOWN": {
     "timeout": 120
   },
@@ -9,7 +11,6 @@
       "user": "myUser",
       "password": "myPassword"
     },
-    "localDir": "/tmp/autonome",
     "remoteDir": "./uploads"
   },
   "MOD_TEMPERATURE": {

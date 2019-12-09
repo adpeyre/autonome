@@ -1,12 +1,17 @@
 import * as Logger from 'js-logger';
 import { ILogger, IContext } from 'js-logger/src/types';
-import { AbstractMod, ConfigInterface } from './mods/AbstractMod';
+import { plainToClass } from 'class-transformer';
+import { validateSync } from 'class-validator';
+import AbstractMod from './mods/AbstractMod';
 import RunnerDependency from './tools/RunnerDependency';
+import AppConfig from './AppConfig';
 
 const fs = require('fs');
 
 export default class App {
-  private config: GlobalConfigInterface;
+  private config: { [key: string]: any };
+
+  private appConfig: AppConfig;
 
   public logger: ILogger;
 
@@ -19,7 +24,7 @@ export default class App {
   private dataToSend: { [key: string]: string } = {};
 
   public constructor() {
-    this.launchTimer();
+    this.startTimer();
     this.logger = this.createLogger();
   }
 
@@ -41,32 +46,44 @@ export default class App {
     );
   }
 
-  public loadConfig(path?: string): Promise<Error> {
-    return new Promise((resolve, reject): void => {
-      if (path === null) {
-        reject(new Error('Config file have to be provided'));
-      }
-      fs.readFile(path, (err: NodeJS.ErrnoException | null, data: Buffer): void => {
-        if (err) {
-          reject(new Error(`Config is missing: ${err}`));
-        }
+  public async loadConfig(path?: string): Promise<void> {
+    if (path === null) {
+      throw new Error('Config file have to be provided');
+    }
 
-        try {
-          this.config = JSON.parse(data.toString());
-          resolve();
-        } catch {
-          reject(new Error('Impossible to parse configuration file.'));
-        }
-      });
-    });
+    const data = fs.readFileSync(path);
+    this.config = JSON.parse(data.toString());
+    this.appConfig = plainToClass(AppConfig, this.config.APP);
+
+    if (!this.appConfig) {
+      throw new Error('App section is missing in your configuration file.');
+    }
+
+    const validationErrors = validateSync(this.appConfig, { skipMissingProperties: false });
+    if (validationErrors.length > 0) {
+      throw new Error(Object.values(validationErrors).join());
+    }
   }
 
-  public getConfig(key: string): ConfigInterface | null {
-    if (!(key in this.config)) {
+  public getAppConfig(): AppConfig {
+    return this.appConfig;
+  }
+
+  public getConfigSection(section: string): { [key: string]: any | null } {
+    if (!(section in this.config)) {
       return null;
     }
 
-    return this.config[key];
+    return this.config[section];
+  }
+
+  public getConfigKey(section: string, key: string): any | null {
+    const configSection = this.getConfigSection(section);
+    if (!configSection) {
+      return null;
+    }
+
+    return configSection[key];
   }
 
   public halt(force?: boolean): void {
@@ -121,13 +138,9 @@ export default class App {
     return Logger.get('Application');
   }
 
-  protected launchTimer(): void {
+  protected startTimer(): void {
     setInterval((): void => {
       this.timer += 1;
     }, 1000);
   }
-}
-
-interface GlobalConfigInterface {
-  [key: string]: ConfigInterface;
 }
