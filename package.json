@@ -28,7 +28,7 @@
     "@types/shelljs": "^0.8.6",
     "axios": "^0.18.1",
     "child_process": "^1.0.2",
-    "class-transformer": "^0.2.3",
+    "class-transformer": "^0.3.1",
     "class-validator": "^0.11.0",
     "eventbusjs": "^0.2.0",
     "fs": "0.0.1-security",
