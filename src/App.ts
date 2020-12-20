@@ -9,9 +9,9 @@ import AppConfig from './AppConfig';
 const fs = require('fs');
 
 export default class App {
-  private config: { [key: string]: any };
+  private config!: { [key: string]: any };
 
-  private appConfig: AppConfig;
+  private appConfig!: AppConfig;
 
   public logger: ILogger;
 
@@ -46,7 +46,7 @@ export default class App {
     );
   }
 
-  public async loadConfig(path?: string): Promise<void> {
+  public async loadConfig(path: string|null): Promise<void> {
     if (path === null) {
       throw new Error('Config file have to be provided');
     }
@@ -69,7 +69,7 @@ export default class App {
     return this.appConfig;
   }
 
-  public getConfigSection(section: string): { [key: string]: any | null } {
+  public getConfigSection(section: string): { [key: string]: any } | null  {
     if (!(section in this.config)) {
       return null;
     }
@@ -112,12 +112,10 @@ export default class App {
 
   protected createLogger(): ILogger {
     const consoleHandler = Logger.createDefaultHandler({
-      /* eslint @typescript-eslint/no-explicit-any: 'off' */
-      formatter: (messages: any[]): void => {
-        messages.unshift(`{t${this.timer}} => `);
-      },
+      formatter: (): void => {},
     });
-    Logger.setLevel(Logger.TRACE);
+
+    Logger.setLevel(Logger.INFO);
     /* eslint @typescript-eslint/no-explicit-any: 'off' */
     Logger.setHandler((messages: any[], context: IContext): void => {
       const messagesFiltered = Object.values(messages).map((msg: any): string => {
@@ -131,6 +129,10 @@ export default class App {
 
         return msg;
       });
+
+      const minutes = Math.floor(this.timer / 60);
+      const seconds = this.timer - minutes * 60;
+      messagesFiltered.unshift(`${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')} `);
       this.logs.push(...messagesFiltered);
       consoleHandler(messagesFiltered, context);
     });

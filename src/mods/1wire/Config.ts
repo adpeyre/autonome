@@ -7,5 +7,5 @@ export default class implements ModConfigInterface {
   @IsArray()
   @ValidateNested()
   @Type(() => SensorConfig)
-  sensors: SensorConfig[];
+  sensors: SensorConfig[] = [];
 }

@@ -44,6 +44,8 @@ A module to call specific url
 ##### MOD_INTERNET
 A module to connect to internet with a 3G key. You have to provide a wvdial file configuration.
 
+##### MOD_COMMAND
+A module to execute specific commands.
 
 ## Get executable
 You can download executable [here](https://projet.peyre.fr/autonome/).

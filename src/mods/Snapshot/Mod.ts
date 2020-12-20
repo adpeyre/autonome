@@ -1,52 +1,41 @@
-import { plainToClass } from 'class-transformer';
 import AbstractMod from '../AbstractMod';
 import Config from './Config';
 import CamConfig from './CamConfig';
 
-import shell = require('shelljs');
-
 const NodeWebcam = require('node-webcam');
 
 export default class ModSnapshot extends AbstractMod {
-  protected config?: Config;
 
-  protected load(): void {
-    this.name = 'MOD_SNAPSHOT';
-    this.config = plainToClass(Config, this.app.getConfigSection(this.name));
-  }
+  protected config: Config = new Config();
+  protected name: string = 'MOD_SNAPSHOT';
 
-  protected exec(): void {
-    const promises: Promise<Error>[] = [];
+  protected async exec(): Promise<void|string> {
 
-    this.config.cams.forEach((cam: CamConfig): void => {
-      promises.push(this.capture(cam, promises));
-    });
+    let hasErrors = false;
 
-    Promise.all(promises).then((capturesResume: []): void => {
-      capturesResume.forEach((resume: string, index: number): void => {
-        this.log(`${this.config.cams[index].filename}: ${resume}`);
-      });
-
-      if (capturesResume.find(cr => cr !== null)) {
-        this.endErr();
-      } else {
-        this.endOk();
+    for (const cam of this.config.cams) {
+      const resume = await this.capture(cam);
+      this.log(`${cam.filename}: ${resume !== null ? resume.message : 'Ok'}`);
+      if (resume !== null) {
+        hasErrors = true;
       }
-    });
+    }
+
+    if (hasErrors) {
+      throw new Error();
+    }
   }
 
-  private capture(opts: CamConfig, waitingPromises: Promise<Error>[]): Promise<Error | null> {
+  private capture(opts: CamConfig): Promise<Error | null> {
     return new Promise((resolve): void => {
-      Promise.all(waitingPromises).finally((): void => {
-        const filename = `${this.app.getAppConfig().directory}/${opts.filename}`;
-        NodeWebcam.capture(filename, opts.fswebcam, (err: Error | null): void => {
-          resolve(err);
-        });
+      const filename = `${this.app.getAppConfig().directory}/${opts.filename}`;
+      NodeWebcam.capture(filename, opts.fswebcam, (err: Error | null): void => {
+        resolve(err);
       });
     });
   }
 
   protected dependencyChecker(): boolean {
-    return shell.which('fswebcam') !== '';
+    return this.commandExists('fswebcam');
   }
 }

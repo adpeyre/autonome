@@ -1,10 +1,6 @@
 module.exports = {
     "settings": {
-        "import/resolver": {
-            "node": {
-                "extensions": [".js", ".jsx", ".ts", ".tsx", ".d.ts"]
-            }
-        }
+        "import/resolver": 'webpack'
     },
     parser: '@typescript-eslint/parser',
     extends: [
@@ -32,10 +28,15 @@ module.exports = {
         "prefer-destructuring": "off",
         "no-unused-expressions": "off",
         "no-restricted-syntax": "off",
-        "@typescript-eslint/no-var-requires": "off",
         "@typescript-eslint/no-empty-interface": "off",
         "import/prefer-default-export": "off",
         "@typescript-eslint/no-empty-function": "off",
-        '@typescript-eslint/no-inferrable-types': "off"
+        '@typescript-eslint/no-inferrable-types': "off",
+        'import/extensions': ['error', 'ignorePackages', {
+            ts: 'never',
+            tsx: 'never',
+            js: 'never',
+            jsx: 'never',
+        }],
     },
 };

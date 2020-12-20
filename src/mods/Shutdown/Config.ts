@@ -3,5 +3,5 @@ import ModConfigInterface from '../ModConfigInterface';
 
 export default class implements ModConfigInterface {
   @IsInt()
-  timeout: number;
+  timeout!: number;
 }

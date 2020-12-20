@@ -4,5 +4,5 @@ import ModConfigInterface from '../ModConfigInterface';
 
 export default class implements ModConfigInterface {
   @ValidateNested()
-  axios: AxiosRequestConfig;
+  axios!: AxiosRequestConfig;
 }
