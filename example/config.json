@@ -13,11 +13,10 @@
     },
     "remoteDir": "./uploads"
   },
-  "MOD_TEMPERATURE": {
+  "MOD_1WIRE": {
     "sensors": [{
-      "type": "1_WIRE",
       "id": "28-000005d36c35",
-      "name": "sensor_1"
+      "name": "sonde_1"
     }]
   },
   "MOD_NOTIFY": {
@@ -36,18 +35,11 @@
           "height": 2448,
           "delay": 3,
           "device": "/dev/cam1",
-          "verbose": true,
           "skip": 15
         }
       }
     ]
   },
   "MOD_INTERNET": {
-    "ipTest": "8.8.8.8",
-    "mobile": {
-      "wvdial": "example/wvdial.conf",
-      "interface": "/dev/ttyUSB0",
-      "pin": "0444"
-    }
   }
 }
