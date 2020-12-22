@@ -1,19 +1,16 @@
 const path = require('path');
-const nodeExternals = require('webpack-node-externals');
 
 module.exports = {
-  mode: 'development',
+  mode: 'production',
   entry: './src/index.ts',
   output: {
-    filename: 'app.js',
+    filename: 'autonome.js',
     path: path.resolve(__dirname, 'build'),
   },
   resolve: {
     extensions: [ '.ts', '.js', '.d.ts' ],
   },
   target: "node",
-
-  //externals: [nodeExternals()],
   module: {
     rules: [
       {

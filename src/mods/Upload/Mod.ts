@@ -2,13 +2,12 @@ import AbstractMod from '../AbstractMod';
 import Config from './Config';
 
 const FtpClient = require('@icetee/ftp');
-
 const fs = require('fs');
 
 export default class ModUpload extends AbstractMod {
-
   protected config: Config = new Config();
-  protected name: string = 'MOD_UPLOAD';
+
+  protected name = 'MOD_UPLOAD';
 
   protected async exec(): Promise<void|string> {
     const promises: Promise<boolean>[] = [];

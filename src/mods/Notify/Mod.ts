@@ -1,11 +1,12 @@
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 import { URLSearchParams } from 'url';
+
 import AbstractMod from '../AbstractMod';
 import Config from './Config';
 
 export default class ModNotify extends AbstractMod {
-
   protected config: Config = new Config();
+
   protected name: string = 'MOD_NOTIFY';
 
   public async exec(): Promise<void|string> {
@@ -16,7 +17,7 @@ export default class ModNotify extends AbstractMod {
     }
 
     const axiosConfig = Object.assign(this.config.axios, {
-      data: params,
+      data: params
     });
 
     await axios(axiosConfig);

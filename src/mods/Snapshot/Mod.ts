@@ -5,18 +5,18 @@ import CamConfig from './CamConfig';
 const NodeWebcam = require('node-webcam');
 
 export default class ModSnapshot extends AbstractMod {
-
   protected config: Config = new Config();
+
   protected name: string = 'MOD_SNAPSHOT';
 
+  /* eslint no-await-in-loop: "off" */
   protected async exec(): Promise<void|string> {
-
     let hasErrors = false;
 
     for (const cam of this.config.cams) {
       const resume = await this.capture(cam);
-      this.log(`${cam.filename}: ${resume !== null ? resume.message : 'Ok'}`);
-      if (resume !== null) {
+      this.log(`${cam.filename}: ${null !== resume ? resume.message : 'Ok'}`);
+      if (null !== resume) {
         hasErrors = true;
       }
     }
@@ -35,7 +35,7 @@ export default class ModSnapshot extends AbstractMod {
     });
   }
 
-  protected dependencyChecker(): boolean {
-    return this.commandExists('fswebcam');
+  protected requiredCommands(): string[] {
+    return ['fswebcam'];
   }
 }

@@ -2,26 +2,19 @@ import 'reflect-metadata';
 
 import App from './App';
 import AbstractMod from './mods/AbstractMod';
-
 import RunnerDependency from './tools/RunnerDependency';
 import ModsLoader from './tools/ModsLoader';
-import {WriteStream} from "fs";
 
 const mkdirp = require('mkdirp');
 
 const app = new App();
-
-process.prependListener('warning', (e) => {
-  console.log('message', e);
-});
-
 
 process.on('unhandledRejection', (e: Error): void => {
   app.logger.error(`${e}`);
   app.halt();
 });
 
-app.loadConfig(process.argv.length >= 3 ? process.argv[2] : null).then((): void => {
+app.loadConfig(3 <= process.argv.length ? process.argv[2] : null).then((): void => {
   mkdirp(app.getAppConfig().directory, (err: string): void => {
     if (err) {
       throw new Error(`Impossible to create base directory: ${err}`);
