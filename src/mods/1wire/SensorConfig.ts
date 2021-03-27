@@ -2,11 +2,8 @@ import { IsString } from 'class-validator';
 
 export default class SensorType {
   @IsString()
-  type: string;
+  id!: string;
 
   @IsString()
-  id: string;
-
-  @IsString()
-  name: string;
+  name!: string;
 }

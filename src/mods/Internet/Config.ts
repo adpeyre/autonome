@@ -1,14 +1,14 @@
-import { IsOptional, IsString, ValidateNested } from 'class-validator';
-import { Type } from 'class-transformer';
+import { IsPositive, IsString } from 'class-validator';
+
 import ModConfigInterface from '../ModConfigInterface';
-import WvdialConfig from './WvdialConfig';
 
 export default class implements ModConfigInterface {
   @IsString()
-  ipTest: string;
+  ipTest: string = '8.8.8.8';
 
-  @ValidateNested()
-  @Type(() => WvdialConfig)
-  @IsOptional()
-  mobile?: WvdialConfig;
+  @IsPositive()
+  delayBetweenAttempts: number = 5000;
+
+  @IsPositive()
+  maxRetries: number = 10;
 }

@@ -1,17 +1,19 @@
 import * as Logger from 'js-logger';
-import { ILogger, IContext } from 'js-logger/src/types';
+import { ILogger } from 'js-logger';
 import { plainToClass } from 'class-transformer';
-import { validateSync } from 'class-validator';
+
 import AbstractMod from './mods/AbstractMod';
 import RunnerDependency from './tools/RunnerDependency';
 import AppConfig from './AppConfig';
+import ModConfigInterface from './mods/ModConfigInterface';
+import ConfigValidator from './tools/ConfigValidator';
 
 const fs = require('fs');
 
 export default class App {
-  private config: { [key: string]: any };
+  private config!: { [key: string]: any };
 
-  private appConfig: AppConfig;
+  private appConfig!: AppConfig;
 
   public logger: ILogger;
 
@@ -42,13 +44,13 @@ export default class App {
         }
 
         return mod.start();
-      },
+      }
     );
   }
 
-  public async loadConfig(path?: string): Promise<void> {
-    if (path === null) {
-      throw new Error('Config file have to be provided');
+  public async loadConfig(path: string|null): Promise<void> {
+    if (null === path) {
+      throw new Error('Config file has to be provided');
     }
 
     const data = fs.readFileSync(path);
@@ -56,12 +58,12 @@ export default class App {
     this.appConfig = plainToClass(AppConfig, this.config.APP);
 
     if (!this.appConfig) {
-      throw new Error('App section is missing in your configuration file.');
+      throw new Error('APP section is missing in your configuration file.');
     }
 
-    const validationErrors = validateSync(this.appConfig, { skipMissingProperties: false });
-    if (validationErrors.length > 0) {
-      throw new Error(Object.values(validationErrors).join());
+    const appConfigErrors = ConfigValidator.validates(this.appConfig);
+    if (0 < appConfigErrors.length) {
+      throw new Error(Object.values(appConfigErrors).join());
     }
   }
 
@@ -69,21 +71,12 @@ export default class App {
     return this.appConfig;
   }
 
-  public getConfigSection(section: string): { [key: string]: any | null } {
+  public getConfigSection(section: string): ModConfigInterface | null {
     if (!(section in this.config)) {
       return null;
     }
 
     return this.config[section];
-  }
-
-  public getConfigKey(section: string, key: string): any | null {
-    const configSection = this.getConfigSection(section);
-    if (!configSection) {
-      return null;
-    }
-
-    return configSection[key];
   }
 
   public halt(force?: boolean): void {
@@ -112,16 +105,13 @@ export default class App {
 
   protected createLogger(): ILogger {
     const consoleHandler = Logger.createDefaultHandler({
-      /* eslint @typescript-eslint/no-explicit-any: 'off' */
-      formatter: (messages: any[]): void => {
-        messages.unshift(`{t${this.timer}} => `);
-      },
+      formatter: (): void => {}
     });
-    Logger.setLevel(Logger.TRACE);
+
     /* eslint @typescript-eslint/no-explicit-any: 'off' */
-    Logger.setHandler((messages: any[], context: IContext): void => {
+    Logger.setHandler((messages: any[], context): void => {
       const messagesFiltered = Object.values(messages).map((msg: any): string => {
-        if (typeof msg === 'object') {
+        if ('object' === typeof msg) {
           if (msg.stderr) {
             return msg.stderr;
           }
@@ -131,11 +121,17 @@ export default class App {
 
         return msg;
       });
+
+      const minutes = Math.floor(this.timer / 60);
+      const seconds = this.timer - minutes * 60;
+      messagesFiltered.unshift(`${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')} `);
       this.logs.push(...messagesFiltered);
       consoleHandler(messagesFiltered, context);
     });
+    const myLogger = Logger.get('Application');
+    myLogger.setLevel({ value: 1, name: 'trace' });
 
-    return Logger.get('Application');
+    return myLogger;
   }
 
   protected startTimer(): void {

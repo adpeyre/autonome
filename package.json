@@ -1,7 +1,7 @@
 {
   "name": "@adpeyre/autonome",
-  "version": "0.9.0",
-  "description": "Autonome is an app for keeping an eye on a place.",
+  "version": "1.0.0",
+  "description": "Autonome is an app for keeping an eye on something.",
   "author": "Adrien Peyre",
   "repository": {
     "type": "git",
@@ -18,45 +18,41 @@
   "scripts": {
     "build": "webpack",
     "watch": "webpack --watch",
-    "prettier": "prettier --write 'src/**/*.{js,ts}'",
     "lint": "eslint 'src/**/*.{js,ts}'",
-    "lint-fix": "eslint 'src/**/*.{js,ts}' --fix",
-    "bin": "./script/pkg-build.sh"
+    "lint-fix": "eslint 'src/**/*.{js,ts}' --fix"
   },
   "dependencies": {
-    "@types/ftp": "^0.3.30",
-    "@types/shelljs": "^0.8.6",
-    "axios": "^0.18.1",
+    "@icetee/ftp": "^1.0.8",
+    "axios": "^0.21.0",
     "child_process": "^1.0.2",
     "class-transformer": "^0.2.3",
-    "class-validator": "^0.11.0",
+    "class-validator": "^0.12.2",
     "eventbusjs": "^0.2.0",
     "fs": "0.0.1-security",
-    "ftp": "^0.3.10",
-    "js-logger": "^1.6.0",
-    "mkdirp": "^0.5.1",
-    "node-webcam": "^0.5.0",
+    "js-logger": "^1.6.1",
+    "mkdirp": "^0.5.5",
+    "node-webcam": "^0.6.4",
+    "path": "^0.12.7",
     "reflect-metadata": "^0.1.13",
-    "shelljs": "^0.8.3"
+    "shelljs": "^0.8.4",
+    "url": "^0.11.0"
   },
   "devDependencies": {
-    "@symfony/webpack-encore": "^0.28.2",
-    "@types/node": "^10.17.5",
-    "@types/webpack-env": "^1.14.1",
-    "@typescript-eslint/eslint-plugin": "^2.8.0",
-    "@typescript-eslint/parser": "^2.8.0",
-    "eslint": "^6.7.0",
-    "eslint-config-airbnb-base": "^14.0.0",
-    "eslint-config-prettier": "^6.7.0",
+    "@types/ftp": "^0.3.31",
+    "@types/node": "^10.17.49",
+    "@types/shelljs": "^0.8.8",
+    "@types/webpack-env": "^1.16.0",
+    "@typescript-eslint/eslint-plugin": "^2.34.0",
+    "@typescript-eslint/parser": "^2.34.0",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-base": "^14.2.1",
     "eslint-import-resolver-typescript": "^1.1.1",
-    "eslint-plugin-import": "^2.18.2",
-    "eslint-plugin-prettier": "^3.1.1",
-    "pkg": "^4.4.0",
-    "prettier": "1.19.1",
-    "ts-loader": "^6.2.1",
-    "typescript": "^3.7.2",
-    "webpack": "^4.41.2",
-    "webpack-node-externals": "^1.7.2"
+    "eslint-import-resolver-webpack": "^0.12.2",
+    "eslint-plugin-import": "^2.22.1",
+    "ts-loader": "^7.0.5",
+    "typescript": "^3.9.7",
+    "webpack": "^4.44.2",
+    "webpack-cli": "^3.3.12"
   },
   "directories": {
     "example": "example"
@@ -66,5 +62,5 @@
     "watching",
     "raspberry"
   ],
-  "license": "ISC"
+  "license": "MIT"
 }

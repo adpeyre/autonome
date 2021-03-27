@@ -1,41 +1,49 @@
 module.exports = {
-    "settings": {
-        "import/resolver": {
-            "node": {
-                "extensions": [".js", ".jsx", ".ts", ".tsx", ".d.ts"]
-            }
-        }
-    },
-    parser: '@typescript-eslint/parser',
+    parser:  '@typescript-eslint/parser',
+    plugins: ['@typescript-eslint'],
     extends: [
-        'plugin:@typescript-eslint/recommended',
         'eslint:recommended',
         'airbnb-base',
-        'plugin:prettier/recommended',
+        "plugin:@typescript-eslint/eslint-recommended",
+        'plugin:@typescript-eslint/recommended',
     ],
-    parserOptions: {
-        ecmaVersion: 2019,
-        sourceType: 'module',
-    },
     rules: {
-        "indent": "off",
-        "@typescript-eslint/indent": ["error", 2],
-        "class-methods-use-this": "off",
-        "object-shorthand": ["error", "properties"],
-        "comma-dangle": ["error", {
-            "arrays": "always-multiline",
-            "objects": "always-multiline",
-            "imports": "always-multiline",
-            "exports": "always-multiline",
-            "functions": "ignore"
+        'import/extensions': ['error', {
+            'ts': 'never',
+            'json': 'always'
         }],
-        "prefer-destructuring": "off",
-        "no-unused-expressions": "off",
-        "no-restricted-syntax": "off",
-        "@typescript-eslint/no-var-requires": "off",
-        "@typescript-eslint/no-empty-interface": "off",
-        "import/prefer-default-export": "off",
-        "@typescript-eslint/no-empty-function": "off",
-        '@typescript-eslint/no-inferrable-types': "off"
+        'class-methods-use-this': 'off',
+        'no-restricted-syntax': 'off',
+        'quotes': 'error',
+        'semi': 'error',
+        'comma-dangle': ['error', {
+            'arrays': 'only-multiline',
+        }],
+        'max-len': 'off',
+        '@typescript-eslint/no-var-requires': 'off',
+        '@typescript-eslint/no-inferrable-types': ['error', {
+            "ignoreParameters": true,
+            "ignoreProperties": true,
+        }],
+        '@typescript-eslint/no-empty-interface': 'off',
+        '@typescript-eslint/no-empty-function': 'off',
+        'import/order': [
+            'error',
+            {
+                "newlines-between": 'always',
+                'groups': [['builtin', 'external',], ['internal', 'parent', 'sibling', 'index']]
+            },
+        ],
+        'yoda': ['error', 'always', { "onlyEquality": true }],
+    },
+    env: {
+        browser: true,
+    },
+    settings: {
+        'import/resolver': 'webpack',
+    },
+    parserOptions:  {
+        ecmaVersion:  2020,
+        sourceType:  'module',
     },
 };

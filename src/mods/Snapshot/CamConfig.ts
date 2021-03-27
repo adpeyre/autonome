@@ -1,12 +1,9 @@
-import { IsString, ValidateNested } from 'class-validator';
-import { Type } from 'class-transformer';
-import FswebcamConfig from './FswebcamConfig';
+import { IsObject, IsString } from 'class-validator';
 
 export default class CamConfig {
   @IsString()
-  filename: string;
+  filename!: string;
 
-  @ValidateNested()
-  @Type(() => FswebcamConfig)
-  fswebcam: FswebcamConfig;
+  @IsObject()
+  fswebcam!: object;
 }

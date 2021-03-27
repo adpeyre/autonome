@@ -2,11 +2,11 @@ import { IsString } from 'class-validator';
 
 export default class FtpType {
   @IsString()
-  user: string;
+  user!: string;
 
   @IsString()
-  password: string;
+  password!: string;
 
   @IsString()
-  host: string;
+  host!: string;
 }
