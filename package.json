@@ -34,7 +34,7 @@
     "node-webcam": "^0.6.4",
     "path": "^0.12.7",
     "reflect-metadata": "^0.1.13",
-    "shelljs": "^0.8.4",
+    "shelljs": "^0.8.5",
     "url": "^0.11.0"
   },
   "devDependencies": {
